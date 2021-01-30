@@ -7,6 +7,7 @@ defmodule NarouEx.Narou.API do
   alias NarouEx.Models.{Work, Works}
 
   @endpoint_url "https://api.syosetu.com/novelapi/api/"
+  @request_cooldown_duration 1000
 
   @typep user_id :: pos_integer()
   @typep user_ids :: list(user_id) | []
@@ -64,9 +65,10 @@ defmodule NarouEx.Narou.API do
     ]}
     ```
   """
-  @spec fetch_by_user(user_id()) :: {:ok, list(Work.t())} | {:error, atom()}
-  def fetch_by_user(user_id) do
+  @spec fetch_by_user(user_id(), non_neg_integer() | 0) :: {:ok, list(Work.t())} | {:error, atom()}
+  def fetch_by_user(user_id, cooldown_duration \\ 0) do
     queries = %__MODULE__.Queries{userid: user_id}
+    :timer.sleep(cooldown_duration)
     case queries |> generate_url() |> HTTPoison.get() do
       {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
         {:ok, result} = body |> :zlib.gunzip() |> parse_body()
@@ -79,7 +81,8 @@ defmodule NarouEx.Narou.API do
   end
 
   @doc """
-  Fetch works list of multiple users
+  Fetch works list of multiple users.
+  Sending requests have cooldown time(1sec per user id).
 
   ## Examples
 
@@ -134,8 +137,7 @@ defmodule NarouEx.Narou.API do
   def fetch_by_users(user_ids) do
     get_result = fn {_head, body} -> body end
     results = user_ids
-    |> Enum.map(&fetch_by_user/1)
-
+    |> Enum.map(&(&1 |> fetch_by_user(@request_cooldown_duration)))
     case results |> Enum.all?(fn {head, _body} -> head == :ok end) do
       true ->
         results = results
