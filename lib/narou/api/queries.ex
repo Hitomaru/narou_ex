@@ -1,4 +1,8 @@
 defmodule NarouEx.Narou.API.Queries do
+
+  @type user_id :: pos_integer()
+  @type user_ids :: list(user_id) | []
+
   @default_response_format :json
   defstruct(
     gzip: 5,
@@ -38,7 +42,7 @@ defmodule NarouEx.Narou.API.Queries do
     st: 1..2000,
     opt: opt_element() | nil,
     order: order_element(),
-    userid: integer() | nil
+    userid: String.t() | nil
   }
 
   @spec encode_of(__MODULE__.t(), list(of_element())) :: __MODULE__.t()
@@ -47,5 +51,15 @@ defmodule NarouEx.Narou.API.Queries do
     |> Enum.map(&Atom.to_string()/1)
     |> Enum.join("-")
     %{queries | of: of_string}
+  end
+
+  @spec encode_userid(__MODULE__.t(), user_id() | user_ids() ) :: __MODULE__.t()
+  def encode_userid(queries, user_ids) when is_list(user_ids) do
+    userid_string = user_ids
+    |> Enum.join("-")
+    %{queries | userid: userid_string}
+  end
+  def encode_userid(queries, user_id) when is_bitstring(user_id) or is_integer(user_id) do
+    %{queries | userid: user_id}
   end
 end

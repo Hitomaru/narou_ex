@@ -5,13 +5,9 @@ defmodule NarouEx.Narou.API do
   """
 
   alias NarouEx.Models.{Work, Works}
+  alias NarouEx.Narou.API.Queries
 
   @endpoint_url "https://api.syosetu.com/novelapi/api/"
-  @request_cooldown_duration 1000
-
-  @typep user_id :: pos_integer()
-  @typep user_ids :: list(user_id) | []
-
 
   @doc """
   Fetch works list of specific user.
@@ -62,12 +58,12 @@ defmodule NarouEx.Narou.API do
         istensei: 0,
         end: 1
       }
-    ]}
+    ]
     ```
   """
-  @spec fetch_by_user(user_id(), non_neg_integer() | 0) :: {:ok, list(Work.t())} | {:error, atom()}
-  def fetch_by_user(user_id, cooldown_duration \\ 0) when is_integer(user_id) and is_integer(cooldown_duration) do
-    queries = %__MODULE__.Queries{userid: user_id}
+  @spec fetch_by_user(Queries.user_id(), non_neg_integer() | 0) :: {:ok, list(Work.t())} | {:error, atom()}
+  def fetch_by_user(user_id, cooldown_duration \\ 0) when is_integer(user_id) or is_list(user_id) and is_integer(cooldown_duration) do
+    queries = %__MODULE__.Queries{} |> Queries.encode_userid(user_id)
     :timer.sleep(cooldown_duration)
     case queries |> generate_url() |> HTTPoison.get() do
       {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
@@ -78,75 +74,6 @@ defmodule NarouEx.Narou.API do
       {:error, %HTTPoison.Error{reason: reason}} ->
         {:error, reason}
     end
-  end
-
-  @doc """
-  Fetch works list of multiple users.
-  Sending requests have cooldown time(1sec per user id).
-
-  ## Examples
-
-    ```
-    NarouEx.Narou.API.fetch_by_users([1623940])
-    :ok,
-    [
-      %NarouEx.Models.Work{
-        isr15: 0,
-        biggenre: 4,
-        updated_at: "2021-01-26 06:03:51",
-        weekly_unique: 0,
-        all_hyoka_cnt: 15,
-        weekly_point: 0,
-        story: "ポストアポカリプスSF百合ファンタジー\n\n今から300年ほど前のこと。\nこの惑星エミーラには高度な文明が築かれていました。人の必要とする殆どのものを生み出す自動工場、地球の反対側のことすら瞬時にわかるという通信網。人々の生活圏は惑星中を埋め尽くし、重力のくびきを脱そうとしつつありました。しかしそんな文明の絶頂期が長く続くことはなかったのです。\n\n長い黄昏の時代を経て、人々の暮らしは安定しつつあります。少なくとも恐ろしい暴走無人機が片端から人を殺そうとうろついてはいませんし、それらを討ち滅ぼすために軍隊が街ごと焦土に変えてしまうようなこともなくなりました。ただし、そんな機械や爆弾を作れるだけのわざ自体を忘れてもしまいましたが。\n\nそんな時代に彼女は生まれて、そして気がついてしまいました。私は、この世界で生きていくのに向いていない。\nとても恵まれた境遇に生まれたにもかかわらず、それでも彼女は思ってしまうのです。息苦しいと。彼女は苦し紛れにあがき、そして一つの希望を手にします。古代の力を今に取り戻す古術学者の道。古代、人々が貴族と平民とに分かたれず、誰もが平等に、そして豊かに暮らしていたとされる理想の時代。\n\n彼女のあこがれは世界を動かす複雑な歯車の動きとたまたま噛み合って、そして一つの出会いを生み出しました。人の力が今よりもずっと強かった時代、人が貪欲にその勢力圏を広げ、自分たち自身すらも征服しようとした努力の結晶、全自律無人機。人の姿をして、人のように語り、そして機械のように力強いもの。\n\n彼女たちの出会いが世界に何をもたらすのか。全自律無人機の高度な演算能力をもってすら、それは予測のできないことでした。\n\n特設サイトを公開しています。ショートPVなどもありますので、ご興味の方は是非ご覧ください。\nhttps://emilla.space",
-        review_cnt: 0,
-        isstop: 0,
-        length: 222113,
-        quarter_point: 16,
-        keyword: "残酷な描写あり ガールズラブ 冒険 人工知能 シリアス 女主人公 アンドロイド ロボット 未来 人外 ポストアポカリプス",
-        impression_cnt: 0,
-        daily_point: 0,
-        isbl: 0,
-        general_firstup: "2019-04-26 23:23:28",
-        writer: "壕野一廻",
-        iszankoku: 1,
-        genre: 403,
-        title: "明ける世界の夢見る機械",
-        sasie_cnt: 4,
-        general_lastup: "2021-01-25 22:46:49",
-        global_point: 326,
-        pc_or_k: 2,
-        ncode: "N7878FL",
-        userid: 1623940,
-        novel_type: 1,
-        istenni: 0,
-        isgl: 1,
-        monthly_point: 2,
-        yearly_point: 154,
-        all_point: 144,
-        novelupdated_at: "2021-01-25 22:46:49",
-        fav_novel_cnt: 91,
-        gensaku: "",
-        kaiwaritsu: 49,
-        istensei: 0,
-        end: 1
-      }
-    ]}
-    ```
-  """
-  @spec fetch_by_users(user_ids()) :: {:ok, Works.t()}
-  def fetch_by_users(user_ids) when is_list(user_ids) do
-    get_result = fn {_head, body} -> body end
-    results = user_ids
-    |> Enum.map(&(&1 |> fetch_by_user(@request_cooldown_duration)))
-    case results |> Enum.all?(fn {head, _body} -> head == :ok end) do
-      true ->
-        results = results
-        |> Enum.flat_map(get_result)
-        {:ok, results}
-      false ->
-        {:error, :error!}
-    end
-
   end
 
   @spec generate_url(__MODULE__.Queries.t()) :: String.t()
