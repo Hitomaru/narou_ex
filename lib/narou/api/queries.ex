@@ -42,7 +42,7 @@ defmodule NarouEx.Narou.API.Queries do
   }
 
   @spec encode_of(__MODULE__.t(), list(of_element())) :: __MODULE__.t()
-  def encode_of(queries, of_elements) do
+  def encode_of(queries, of_elements) when is_struct(queries, __MODULE__) and is_list(of_elements) do
     of_string = of_elements
     |> Enum.map(&Atom.to_string()/1)
     |> Enum.join("-")

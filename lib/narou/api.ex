@@ -66,7 +66,7 @@ defmodule NarouEx.Narou.API do
     ```
   """
   @spec fetch_by_user(user_id(), non_neg_integer() | 0) :: {:ok, list(Work.t())} | {:error, atom()}
-  def fetch_by_user(user_id, cooldown_duration \\ 0) do
+  def fetch_by_user(user_id, cooldown_duration \\ 0) when is_integer(user_id) and is_integer(cooldown_duration) do
     queries = %__MODULE__.Queries{userid: user_id}
     :timer.sleep(cooldown_duration)
     case queries |> generate_url() |> HTTPoison.get() do
@@ -134,7 +134,7 @@ defmodule NarouEx.Narou.API do
     ```
   """
   @spec fetch_by_users(user_ids()) :: {:ok, Works.t()}
-  def fetch_by_users(user_ids) do
+  def fetch_by_users(user_ids) when is_list(user_ids) do
     get_result = fn {_head, body} -> body end
     results = user_ids
     |> Enum.map(&(&1 |> fetch_by_user(@request_cooldown_duration)))
@@ -150,7 +150,7 @@ defmodule NarouEx.Narou.API do
   end
 
   @spec generate_url(__MODULE__.Queries.t()) :: String.t()
-  defp generate_url(query_parameters) do
+  defp generate_url(query_parameters) when is_struct(query_parameters, __MODULE__.Queries) do
     endpoint_uri = @endpoint_url
     |> URI.parse()
     queries = query_parameters |> Map.from_struct() |> URI.encode_query()
@@ -159,7 +159,7 @@ defmodule NarouEx.Narou.API do
   end
 
   @spec parse_body(String.t()) :: {:ok, Works.t()} | {:error, atom()}
-  defp parse_body(body) do
+  defp parse_body(body) when is_bitstring(body) do
     case body |> Jason.decode() do
       {:ok, decoded_response} when is_list(decoded_response) ->
         result = decoded_response
