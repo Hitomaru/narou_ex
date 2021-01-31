@@ -81,7 +81,63 @@ defmodule NarouEx.Models.Work do
       weekly_unique: Integer.t()
     }
 
-    @spec from(any()) :: __MODULE__.t()
+    @doc """
+
+    ## Examples
+
+    ```
+    iex> %{
+    ...>  kaiwaritsu: 13,
+    ...>  userid: 1,
+    ...>  general_lastup: nil,
+    ...>  updated_at: nil,
+    ...>  novelupdated_at: nil,
+    ...>  general_firstup: nil
+    ...>  } |> NarouEx.Models.Work.from()
+    %NarouEx.Models.Work{
+      isgl: 0,
+      global_point: 0,
+      writer: "",
+      pc_or_k: 0,
+      title: "",
+      isstop: 0,
+      userid: 1,
+      quarter_point: 0,
+      genre: 0,
+      iszankoku: 0,
+      istensei: 0,
+      sasie_cnt: 0,
+      kaiwaritsu: 13,
+      all_hyoka_cnt: 15,
+      general_lastup: nil,
+      length: 0,
+      fav_novel_cnt: 0,
+      ncode: "N0000FL",
+      keyword: "",
+      weekly_point: 0,
+      impression_cnt: 0,
+      biggenre: 0,
+      gensaku: "",
+      isr15: 0,
+      all_point: 0,
+      end: 0,
+      yearly_point: 0,
+      istenni: 0,
+      updated_at: nil,
+      review_cnt: 0,
+      monthly_point: 0,
+      daily_point: 0,
+      weekly_unique: 0,
+      story: "",
+      novel_type: 0,
+      novelupdated_at: nil,
+      isbl: 0,
+      general_firstup: nil
+    }
+    ```
+
+    """
+    @spec from(map()) :: __MODULE__.t()
     def from(map) when is_map(map) do
       struct(__MODULE__, map)
     end
