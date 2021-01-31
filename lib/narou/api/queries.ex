@@ -121,7 +121,7 @@ defmodule NarouEx.Narou.API.Queries do
     |> Enum.join("-")
     %{queries | userid: userid_string}
   end
-  def encode_userid(queries, user_id) when is_bitstring(user_id) or is_integer(user_id) do
+  def encode_userid(queries, user_id) when is_integer(user_id) do
     %{queries | userid: Integer.to_string(user_id)}
   end
 end
