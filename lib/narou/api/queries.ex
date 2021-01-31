@@ -1,4 +1,7 @@
 defmodule NarouEx.Narou.API.Queries do
+  @moduledoc """
+    Data representation of API query strings.
+  """
 
   @type user_id :: pos_integer()
   @type user_ids :: list(user_id) | []
@@ -45,6 +48,24 @@ defmodule NarouEx.Narou.API.Queries do
     userid: String.t() | nil
   }
 
+  @doc """
+  ## Examples
+
+  ```
+  iex> %NarouEx.Narou.API.Queries{}
+  iex> |> NarouEx.Narou.API.Queries.encode_of([:t, :n])
+  %NarouEx.Narou.API.Queries{
+    gzip: 5,
+    lim: 20,
+    of: "t-n",
+    opt: :weekly,
+    order: :new,
+    out: :json,
+    st: 1,
+    userid: nil
+  }
+  ```
+  """
   @spec encode_of(__MODULE__.t(), list(of_element())) :: __MODULE__.t()
   def encode_of(queries, of_elements) when is_struct(queries, __MODULE__) and is_list(of_elements) do
     of_string = of_elements
@@ -53,6 +74,47 @@ defmodule NarouEx.Narou.API.Queries do
     %{queries | of: of_string}
   end
 
+
+  @doc """
+  ## Examples
+
+  ```
+  iex> queries = %NarouEx.Narou.API.Queries{}
+  iex> queries |> NarouEx.Narou.API.Queries.encode_userid([1])
+  %NarouEx.Narou.API.Queries{
+    gzip: 5,
+    lim: 20,
+    of: nil,
+    opt: :weekly,
+    order: :new,
+    out: :json,
+    st: 1,
+    userid: "1"
+  }
+  iex> queries |> NarouEx.Narou.API.Queries.encode_userid([1, 1000])
+  %NarouEx.Narou.API.Queries{
+    gzip: 5,
+    lim: 20,
+    of: nil,
+    opt: :weekly,
+    order: :new,
+    out: :json,
+    st: 1,
+    userid: "1-1000"
+  }
+  iex> queries |> NarouEx.Narou.API.Queries.encode_userid(1)
+  %NarouEx.Narou.API.Queries{
+    gzip: 5,
+    lim: 20,
+    of: nil,
+    opt: :weekly,
+    order: :new,
+    out: :json,
+    st: 1,
+    userid: "1"
+  }
+  ```
+  """
   @spec encode_userid(__MODULE__.t(), user_id() | user_ids() ) :: __MODULE__.t()
   def encode_userid(queries, user_ids) when is_list(user_ids) do
     userid_string = user_ids
@@ -60,6 +122,6 @@ defmodule NarouEx.Narou.API.Queries do
     %{queries | userid: userid_string}
   end
   def encode_userid(queries, user_id) when is_bitstring(user_id) or is_integer(user_id) do
-    %{queries | userid: user_id}
+    %{queries | userid: Integer.to_string(user_id)}
   end
 end
