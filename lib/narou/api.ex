@@ -61,7 +61,7 @@ defmodule NarouEx.Narou.API do
     ]
     ```
   """
-  @spec fetch_by_user(Queries.user_id(), non_neg_integer() | 0) :: {:ok, list(Work.t())} | {:error, atom()}
+  @spec fetch_by_user(Queries.user_id() | Queries.user_ids(), non_neg_integer() | 0) :: {:ok, list(Work.t())} | {:error, atom()}
   def fetch_by_user(user_id, cooldown_duration \\ 0) when is_integer(user_id) or is_list(user_id) and is_integer(cooldown_duration) do
     queries = %__MODULE__.Queries{} |> Queries.encode_userid(user_id)
     :timer.sleep(cooldown_duration)
