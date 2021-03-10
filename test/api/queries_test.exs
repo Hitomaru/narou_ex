@@ -1,6 +1,6 @@
-defmodule NarouExTest.Narou.API.QueriesTest do
+defmodule NarouExTest.API.QueriesTest do
   use ExUnit.Case
-  alias NarouEx.Narou.API.Queries
+  alias NarouEx.API.Queries
   doctest Queries
 
   @reference_user_id 1

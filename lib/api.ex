@@ -1,11 +1,11 @@
-defmodule NarouEx.Narou.API do
+defmodule NarouEx.API do
   @moduledoc """
   API Interface to Shosetsuka-ni-naro
   API Documentation: https://dev.syosetu.com/man/api/
   """
 
   alias NarouEx.Models.{Work, Works}
-  alias NarouEx.Narou.API.Queries
+  alias NarouEx.API.Queries
 
   @endpoint_url "https://api.syosetu.com/novelapi/api/"
 
@@ -15,7 +15,7 @@ defmodule NarouEx.Narou.API do
   ## Examples
 
     ```
-    NarouEx.Narou.API.fetch_by_user(1623940)
+    NarouEx.API.fetch_by_user(1623940)
     :ok,
     [
       %NarouEx.Models.Work{
