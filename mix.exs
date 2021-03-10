@@ -7,7 +7,10 @@ defmodule NarouEx.MixProject do
       version: "0.1.0",
       elixir: "~> 1.11",
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
+      description: description(),
+      name: "NarouEx",
+      package: package()
     ]
   end
 
@@ -18,6 +21,10 @@ defmodule NarouEx.MixProject do
     ]
   end
 
+  defp description do
+    "A data retrieving library for Shosetsuka-ni-Naro(Japanese Novel Community). "
+  end
+
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
@@ -25,6 +32,13 @@ defmodule NarouEx.MixProject do
       {:jason, "~> 1.2"}
       # {:dep_from_hexpm, "~> 0.3.0"},
       # {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"}
+    ]
+  end
+
+  defp package() do
+    [
+      licenses: ["MIT"],
+      links: %{"GitHub" => "https://github.com/Hitomaru/narou_ex"}
     ]
   end
 end
